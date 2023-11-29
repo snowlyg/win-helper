@@ -100,7 +100,11 @@ func Stop(srvName string) error {
 		ps, _ := process.Processes()
 		if len(ps) > 0 {
 			for _, p := range ps {
-				if p.Pid != int32(ppid) {
+				var parentPid int32
+				if parent, err := p.Parent(); err == nil {
+					parentPid = parent.Pid
+				}
+				if p.Pid != int32(ppid) && parentPid != int32(ppid) {
 					continue
 				}
 				err = p.Kill()
